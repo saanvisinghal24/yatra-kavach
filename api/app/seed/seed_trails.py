@@ -251,7 +251,10 @@ async def seed_data():
         await session.commit()
         print("Trail seed completed successfully.")
 
-if __name__ == "__main__":
-    asyncio.run(seed_data())
+async def main():
     from app.seed.staff import seed_staff
-    asyncio.run(seed_staff())
+    await seed_data()
+    await seed_staff()
+
+if __name__ == "__main__":
+    asyncio.run(main())
