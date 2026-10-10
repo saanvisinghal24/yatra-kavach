@@ -1,0 +1,97 @@
+{
+  "offlineSync": "passed",
+  "width": 360,
+  "height": 640,
+  "errors": [],
+  "audit": [
+    {
+      "path": "/",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "path": "/privacy",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "path": "/terms",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "path": "/about",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "path": "/roadmap",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "path": "/register",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "path": "/control",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "path": "/volunteer",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "path": "/demo/offline-check",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "path": "/volunteer-guide",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "path": "/not-found",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "path": "/control/authenticated",
+      "violations": []
+    },
+    {
+      "path": "/health/ZTD9FC",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "path": "/trail/ZTD9FC",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "path": "/pass/ZTD9FC",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "path": "/control/analytics",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "path": "/control/incidents",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "path": "/admin/posters",
+      "overflow": false,
+      "violations": []
+    }
+  ]
+}

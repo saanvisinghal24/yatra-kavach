@@ -1,0 +1,25 @@
+:{$PORT:10000} {
+    encode gzip
+    handle /api/* {
+        reverse_proxy {$API_UPSTREAM} {
+            flush_interval -1
+        }
+    }
+    handle /health {
+        reverse_proxy {$API_UPSTREAM}
+    }
+    handle {
+        root * /srv
+        try_files {path} /index.html
+        file_server
+    }
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        Referrer-Policy no-referrer
+        Permissions-Policy "camera=(self), geolocation=(self), microphone=()"
+        Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.org;; font-src 'self'; connect-src 'self'; worker-src 'self' blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+        -Server
+    }
+}

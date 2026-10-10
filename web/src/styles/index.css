@@ -1,0 +1,262 @@
+@import "./tokens.css";
+
+/* Fontsource Self-Hosted Imports */
+@import "@fontsource/fraunces/latin-400.css";
+@import "@fontsource/fraunces/latin-600.css";
+@import "@fontsource/ibm-plex-sans/latin-400.css";
+@import "@fontsource/ibm-plex-sans/latin-500.css";
+@import "@fontsource/ibm-plex-sans/latin-600.css";
+@import "@fontsource/ibm-plex-mono/latin-400.css";
+@import "@fontsource/ibm-plex-mono/latin-500.css";
+@import "@fontsource/noto-sans-devanagari/devanagari-400.css";
+@import "@fontsource/noto-sans-devanagari/devanagari-600.css";
+
+/* Box sizing and clean reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.5;
+  text-align: left;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Headings in display serif */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+}
+
+h1 { font-size: 1.75rem; }
+h2 { font-size: 1.35rem; }
+h3 { font-size: 1.15rem; }
+
+/* Hindi typography matching size */
+[lang="hi"], .lang-hi {
+  font-family: var(--font-hindi);
+}
+
+/* Tabular Numerals for metrics, times, and altitudes */
+.numeral,
+.tabular-nums,
+[data-num] {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* Small Caps Metadata Label */
+.meta-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+/* Trail notice box style */
+.trail-card {
+  background-color: var(--paper);
+  border: var(--border-hairline);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+}
+
+.trail-card-secondary {
+  background-color: var(--paper-2);
+  border: var(--border-hairline);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+}
+
+/* Contour line texture for section headers */
+.contour-header {
+  background-color: var(--paper-2);
+  background-image: radial-gradient(var(--line) 1px, transparent 0);
+  background-size: 12px 12px;
+  border-bottom: var(--border-hairline);
+  padding: var(--space-4);
+}
+
+/* Interactive Elements (Minimum 48px tap target) */
+button, .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--tap-min);
+  padding: 0 var(--space-4);
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-radius: var(--radius);
+  border: var(--border-hairline);
+  background-color: var(--paper-2);
+  color: var(--ink);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color var(--duration-short) var(--ease-snappy),
+              border-color var(--duration-short) var(--ease-snappy);
+}
+
+button:hover, .btn:hover {
+  background-color: var(--paper);
+  border-color: var(--ink-2);
+}
+
+button.btn-primary, .btn-primary {
+  background-color: var(--deodar);
+  color: #FFFFFF;
+  border-color: var(--deodar-dark);
+}
+
+button.btn-primary:hover, .btn-primary:hover {
+  background-color: var(--deodar-dark);
+}
+
+button.btn-accent, .btn-accent {
+  background-color: var(--accent);
+  color: #FFFFFF;
+  border-color: #9E3F10;
+}
+
+button.btn-accent:hover, .btn-accent:hover {
+  background-color: #9E3F10;
+}
+
+/* Text inputs */
+input[type="text"],
+input[type="tel"],
+input[type="number"],
+input[type="password"],
+select,
+textarea {
+  display: block;
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  color: var(--ink);
+  background-color: var(--paper);
+  border: var(--border-hairline);
+  border-radius: var(--radius);
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: 2px solid var(--deodar);
+  outline-offset: -1px;
+}
+
+/* Severity Indicators (Never colour only: word + icon shape + border) */
+.severity-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: var(--border-hairline);
+}
+
+.severity-ok {
+  background-color: rgba(47, 107, 69, 0.12);
+  color: var(--ok);
+  border-color: var(--ok);
+}
+
+.severity-watch {
+  background-color: rgba(183, 121, 31, 0.14);
+  color: var(--watch);
+  border-color: var(--watch);
+}
+
+.severity-urgent {
+  background-color: rgba(180, 35, 24, 0.14);
+  color: var(--urgent);
+  border-color: var(--urgent);
+}
+
+/* Indicative Data Notice Banner */
+.indicative-notice {
+  font-size: 0.75rem;
+  color: var(--ink-2);
+  border-left: 3px solid var(--watch);
+  padding: var(--space-1) var(--space-2);
+  background: var(--paper-2);
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+.page { max-width: 960px; margin: auto; padding: 24px 16px; min-height: 55vh; }
+.page p, .page section, .page form { margin-block: 18px; }
+.page label { display: block; margin: 16px 0; }
+.page nav, footer nav { display:flex; flex-wrap:wrap; gap:16px; }
+.steps { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:16px; }
+.sync-strip,.staff-bar { padding:8px 16px; border-block:1px solid var(--line); display:flex; flex-wrap:wrap; gap:12px; align-items:center; }
+footer { padding:24px 16px; border-top:1px solid var(--line); }
+button,.btn,input,select,summary { min-height:48px !important; }
+button,.btn { white-space:normal; }
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible { outline:3px solid var(--accent); outline-offset:3px; }
+.table-scroll { overflow:auto; } th,td { padding:12px; border-bottom:1px solid var(--line); text-align:left; }
+dd { margin:0 0 12px; overflow-wrap:anywhere; } dt { font-weight:600; }
+.poster { text-align:center; border:1px solid var(--line); padding:30px; margin:20px 0; break-after:page; }
+.poster img { width:100%; max-width:420px; }
+textarea { width:100%; min-height:110px; font:inherit; }
+@media(max-width:600px){.contour-header {flex-wrap:wrap; gap:16px;} .page{padding:16px;} h1{font-size:1.9rem;} header{flex-wrap:wrap;gap:12px;} }
+@page { size:A4; margin:15mm; }
+@media print { header,footer,.no-print,.sync-strip,.staff-bar,.install{display:none !important;} .page{padding:0;max-width:none;} .poster{border:0;margin:0;min-height:250mm;} body{background:white;} }
+
+body {font-family: "IBM Plex Sans", "Noto Sans Devanagari", sans-serif;}
+
+a {color:var(--deodar);text-underline-offset:3px;} nav a {min-height:48px;display:inline-flex;align-items:center;} button,input,select,textarea {font-family:var(--font-sans);}
+.theme-control-dark {--urgent:#FF9C91;--watch:#EDC477;--deodar:#B7D4BF;--accent:#F4B083;}
+.theme-control-dark .btn-primary {background:#2F4B3A;color:#FFFFFF;}
+.theme-control-dark .severity-urgent {color:#FFB3AA;background:#382523;}
+.theme-control-dark .severity-watch {color:#F5D49A;background:#342D20;}
+.theme-control-dark a {color:#C2DDCA;}
+
+.member-choice { display:flex;align-items:center;gap:12px;min-height:48px; }
+.member-choice input { width:24px;height:24px; }
+fieldset {min-width:0;border:1px solid var(--line);padding:16px;margin:16px 0;}
+svg{max-width:100%;} .page, .trail-card {overflow-wrap:anywhere;}
+
+/* Hackathon interface: deodar green, warm stone, restrained Himachali bands. */
+:root{--radius:10px;--paper:#faf8f2;--paper-2:#f0eee5;--line:#d9ddd4}
+#root{min-height:100vh;display:flex;flex-direction:column}main{flex:1}
+.entry-page{display:grid;grid-template-columns:1.15fr 1fr;width:min(1120px,calc(100% - 40px));margin:38px auto 48px;min-height:590px;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 16px 45px #1734270a}
+.entry-story{background:#203d32;color:#e4eee7;padding:56px 46px;display:flex;flex-direction:column;align-items:flex-start;gap:24px;position:relative;border-top:7px solid #b96435}
+.entry-story h1{color:#fff;font-size:clamp(2.4rem,4vw,3.65rem);line-height:1.12}.entry-story p{max-width:410px;color:#d8e2dc}.entry-story a{color:#f0d6af}.entry-story small{color:#bed0c4;margin-top:auto}.entry-intro{font-size:1.15rem}.eyebrow{font-size:.7rem;font-weight:600;letter-spacing:.14em;display:block;margin-bottom:10px}.entry-route{display:flex;gap:22px;padding:15px 0;border-block:1px solid #ffffff30;width:100%;font-size:.8rem}.entry-route span::before{content:'●';color:#d9a972;margin-right:8px}
+.entry-form{padding:48px 42px}.entry-form h2{font-size:2rem;margin-bottom:8px}.entry-form>p{color:var(--ink-2);margin-bottom:26px}.entry-tabs{display:flex;gap:8px;margin:24px 0}.entry-tabs button{flex:1;padding:8px;font-size:.85rem}.entry-form label{display:block;margin:18px 0;font-size:.9rem;font-weight:500}.entry-form input{margin-top:7px}.wide{width:100%;min-height:50px}.form-help{font-size:.8rem;color:var(--ink-2);margin:16px 0;line-height:1.6}.form-divider{margin:24px 0 12px;text-align:center;color:var(--ink-2);font-size:.85rem}.entry-help{display:block;text-align:center;margin-top:28px;font-size:.85rem}.form-error{padding:12px;background:#fff1ed;color:#8e2c16;border-left:3px solid #b33f20;margin-top:16px}
+input:not([type=checkbox]):not([type=radio]),select,textarea{display:block;width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:7px;background:var(--paper);font:inherit;color:var(--ink);min-width:0}input[type=checkbox],input[type=radio]{min-height:20px!important;width:20px;vertical-align:middle;margin-right:6px}label{line-height:1.7}button:disabled{opacity:.55;cursor:wait}summary{cursor:pointer;padding:12px 0}nav{flex-wrap:wrap;gap:14px}.trail-card{margin-bottom:16px}.trail-card nav{display:flex;gap:16px}.trail-card details button{margin:5px}.sync-strip{justify-content:center;background:#ecefe8;font-size:.82rem;padding:12px 20px;gap:16px}.sync-strip button{min-height:36px!important;font-size:.8rem}footer{background:#203d32;color:#dce6df;padding:30px max(24px,calc((100% - 1120px)/2));display:grid;grid-template-columns:1fr auto;gap:12px 40px;font-size:.85rem;border-top:5px solid #b96435}footer nav{justify-content:flex-end}footer a{color:#e0d6bb}footer p:last-child{color:#b5c9bb}.staff-bar{justify-content:center}.pass-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:16px}
+.manimahesh-map{height:420px;width:100%;border:1px solid var(--line);border-radius:10px;background:#e7ece2;z-index:0}.checkpoint-label{font-family:var(--font-sans);font-weight:600;color:#203d32}.map-note{background:#f4e8d3;color:#5d401d;padding:12px;font-size:.85rem}.checkpoint-overview{list-style:none;display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:22px 0;padding:0}.checkpoint-overview li{display:flex;gap:10px;align-items:center;padding:12px;background:var(--paper-2);border-radius:8px;font-size:.8rem}.checkpoint-overview li>span{color:var(--accent);font-family:var(--font-mono)}.checkpoint-overview small{display:block;color:var(--ink-2)}.theme-control-dark .checkpoint-overview{--paper-2:#26392e}.theme-control-dark .leaflet-popup-content{color:#203d32}.contour-header{gap:14px;flex-wrap:wrap}
+@media(max-width:760px){.entry-page{grid-template-columns:1fr;margin:20px auto;width:calc(100% - 24px)}.entry-story{padding:30px;gap:18px}.entry-story h1{font-size:2.5rem}.entry-form{padding:28px}.checkpoint-overview{grid-template-columns:1fr 1fr}.manimahesh-map{height:350px}footer{grid-template-columns:1fr;text-align:center}footer nav{justify-content:center}header nav{gap:4px!important;flex-wrap:wrap}.entry-route{gap:14px}.theme-control-dark main>div{flex-wrap:wrap}}
+@media print{.pass-actions{display:none}.entry-page{box-shadow:none}}
+@media(max-width:760px){.entry-form{grid-row:1}.entry-story{grid-row:2}.entry-page{border-top:5px solid #b96435}.entry-story{border-top:0}.entry-story h1{font-size:2rem}header nav a{padding:4px 8px}.entry-form{padding:24px}}
+.theme-control-dark .leaflet-control a{color:#203d32}

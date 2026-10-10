@@ -1,0 +1,1 @@
+export function profile(checkpoints:any[]){let distance=0;return checkpoints.map(c=>{distance+=c.dist_from_prev_km;return {id:c.id,seq:c.seq,name:c.name_en,altitudeM:c.altitude_m,distanceKm:distance,cutoff:c.cutoff_time};});}

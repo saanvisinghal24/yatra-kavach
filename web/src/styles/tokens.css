@@ -1,0 +1,68 @@
+:root {
+  /* Surface and ink palette */
+  --paper: #F3EFE6;
+  --paper-2: #E9E3D5;
+  --line: #CFC8B6;
+  --ink: #1B2620;
+  --ink-2: #4A554E;
+
+  /* Botanical brand greens */
+  --deodar: #2F4B3A;
+  --deodar-dark: #1E3227;
+
+  /* Single accent color */
+  --accent: #A74312;
+
+  /* Status and severity */
+  --ok: #2F6B45;
+  --watch: #80500D;
+  --urgent: #B42318;
+
+  /* Spacing Scale (4/8 system) */
+  --space-0: 0px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Borders & radii (max 6px, hairline borders, zero soft drop shadows) */
+  --border-width: 1px;
+  --border-hairline: 1px solid var(--line);
+  --radius-sm: 2px;
+  --radius: 4px;
+  --radius-max: 6px;
+
+  /* Typography Stacks */
+  --font-serif: "Fraunces", "Noto Sans Devanagari", Georgia, serif;
+  --font-sans: "IBM Plex Sans", "Noto Sans Devanagari", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+  --font-hindi: "Noto Sans Devanagari", "IBM Plex Sans", sans-serif;
+
+  /* Interactive minimum tap target size */
+  --tap-min: 48px;
+
+  /* Transitions */
+  --ease-snappy: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-short: 140ms;
+}
+
+/* Control Room Dark Theme Override */
+[data-theme="dark"],
+.theme-control-dark {
+  --paper: #111A15;
+  --paper-2: #18241D;
+  --line: #2C3B32;
+  --ink: #E8E4D8;
+  --ink-2: #98A59C;
+  --deodar: #446A53;
+  --deodar-dark: #1E3227;
+  --accent: #E06A2E;
+  --ok: #479C66;
+  --watch: #DDA33D;
+  --urgent: #E04B3E;
+}

@@ -1,0 +1,71 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?required}
+      POSTGRES_USER: ${POSTGRES_USER:?required}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?required}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  api:
+    build: ./api
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      ENVIRONMENT: production
+      DEBUG: 'false'
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+  sweep:
+    build: ./api
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      ENVIRONMENT: production
+    command: [python, -m, app.services.worker]
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, python, -c, "from pathlib import Path; import time; p=Path('/tmp/yatra-worker-heartbeat'); assert p.exists() and time.time()-p.stat().st_mtime < 180"]
+      interval: 60s
+      timeout: 5s
+      start_period: 90s
+      retries: 3
+  web:
+    build:
+      context: ./web
+      args:
+        VITE_PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:?required}
+        VITE_CONTACT_EMAIL: ${CONTACT_EMAIL:?required}
+    restart: unless-stopped
+    environment:
+      DOMAIN: ${DOMAIN:?required}
+    ports: ['80:80', '443:443', '443:443/udp']
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD-SHELL, 'wget -q --spider https://$${DOMAIN}/health']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+volumes:
+  postgres_data:
+  caddy_data:
+  caddy_config:

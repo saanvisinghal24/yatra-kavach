@@ -1,0 +1,58 @@
+{
+  "R1": {
+    "name": "Fast ascent",
+    "fraction": 0.6,
+    "altitude_m": 3000
+  },
+  "R2": {
+    "name": "Overdue",
+    "watch_factor": 1.25,
+    "urgent_factor": 1.75,
+    "grace_minutes": 20
+  },
+  "R3": {
+    "name": "Cutoff",
+    "timezone": "Asia/Kolkata",
+    "threshold": "checkpoint cutoff_time"
+  },
+  "R4": {
+    "name": "Night on trail",
+    "threshold": "Astral sunset at checkpoint coordinates"
+  },
+  "R5": {
+    "name": "Weather",
+    "rain_mm": 5,
+    "gust_kmh": 50,
+    "temp_c": 0,
+    "codes": [
+      95,
+      96,
+      99
+    ]
+  },
+  "R6": {
+    "name": "Congestion",
+    "threshold": "segment capacity_hint"
+  },
+  "R7": {
+    "name": "Symptoms",
+    "mild": 3,
+    "moderate": 6,
+    "severe": 10,
+    "red_flags": "urgent"
+  },
+  "R8": {
+    "name": "Extended reporting delay (not a missing-person finding)",
+    "factor": 2.0,
+    "grace_minutes": 40
+  },
+  "R9": {
+    "name": "Head count drop",
+    "urgent_minutes": 30
+  },
+  "R10": {
+    "name": "Itinerary",
+    "sleep_gain_m": 500,
+    "altitude_m": 3000
+  }
+}
