@@ -123,8 +123,9 @@ export const TrailView: React.FC = () => {
             <span className="numeral" style={{ fontWeight: 700, fontSize: '1.1rem' }}>{nextCheckpoint.alt}</span>
           </div>
           <p style={{ marginTop: 'var(--space-2)', fontSize: '1rem', color: 'var(--ink)' }}>
-            {tr("Usual time")} <span className="numeral" style={{ fontWeight: 600 }}>{nextCheckpoint.time}</span>{tr(". Cross by")} <span className="numeral" style={{ fontWeight: 600, color: 'var(--accent)' }}>{nextCheckpoint.cutoff}</span>.
+            {tr("Usual time")} <span className="numeral" style={{ fontWeight: 600 }}>{nextCheckpoint.time}</span>.
           </p>
+          {next?.cutoff_time && <p>Configured daily cutoff (IST): <strong>{next.cutoff_time}</strong> · {new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date()) >= next.cutoff_time.slice(0,5) ? 'Cutoff reached — check with checkpoint staff.' : 'Before cutoff — confirm current conditions with staff.'} This is a preset schedule, not a live arrival estimate.</p>}
           <div style={{ display: 'flex', gap: 'var(--space-2)', marginTop: 'var(--space-3)', fontSize: '0.82rem', color: 'var(--ink-2)' }}>
             <span>{tr("Segment Distance:")} <strong className="numeral">{nextCheckpoint.dist}</strong></span>
             <span>•</span>

@@ -1,5 +1,6 @@
 import {useEffect,useRef,useState} from 'react';
 import L from 'leaflet';
+import {manimaheshRoute} from '../trail/ManimaheshRoute';
 import 'leaflet/dist/leaflet.css';
 export const DEMO_CHECKPOINTS=[
  {id:1,name_en:'Hadsar',lat:32.3685,lon:76.6041,altitude_m:2100,status:'open'},
@@ -15,23 +16,21 @@ export function ControlMap({checkpoints,groups=[]}:{checkpoints:any[];groups?:an
  useEffect(()=>{
   if(!ref.current)return;setTiles(false);
   const map=L.map(ref.current,{scrollWheelZoom:false});
-  const valid=points.filter(c=>Number.isFinite(c.lat)&&Number.isFinite(c.lon));
+  const route=manimaheshRoute.points.map(p=>[p[1],p[0]] as L.LatLngTuple);
   const layer=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap contributors'}).addTo(map);
   layer.on('tileload',()=>setTiles(true));
-  const bounds=L.latLngBounds(valid.map(c=>[c.lat,c.lon] as L.LatLngTuple));
-  if(valid.length)map.fitBounds(bounds,{padding:[55,55],maxZoom:14});else map.setView([32.383,76.623],13);
-  valid.forEach((cp,i)=>{
-   const marker=L.circleMarker([cp.lat,cp.lon],{radius:8,color:'#fff',weight:3,fillColor:'#a74312',fillOpacity:1}).addTo(map);
-   const label=document.createElement('span');label.textContent=`${i+1}. ${cp.name_en}`;
-   marker.bindTooltip(label,{permanent:true,direction:i%2?'left':'right',className:'checkpoint-label'});
-   const popup=document.createElement('div');popup.textContent=`${cp.name_en} · ${cp.altitude_m} m · ${cp.status||'Unknown'} (indicative)`;marker.bindPopup(popup);
+  L.polyline(route,{color:'#ffffff',weight:8,opacity:0.95}).addTo(map);
+  L.polyline(route,{color:'#24583b',weight:4,opacity:1}).addTo(map);
+  map.fitBounds(L.latLngBounds(route),{padding:[25,35]});
+  [[route[0],'Hadsar · recorded start'],[route[route.length-1],'Manimahesh · recorded end']].forEach(([position,name])=>{
+   const label=document.createElement('span');label.textContent=String(name);
+   L.circleMarker(position as L.LatLngTuple,{radius:7,color:'#fff',weight:2,fillColor:'#a74312',fillOpacity:1}).addTo(map).bindTooltip(label,{direction:'top'});
   });
-  groups.forEach(g=>{const cp=valid.find(c=>c.id===g.last_checkpoint_id);if(cp){const label=document.createElement('span');label.textContent=g.code;L.circleMarker([cp.lat,cp.lon],{radius:4,color:'#1e3227'}).addTo(map).bindPopup(label);}});
   const observer=new ResizeObserver(()=>map.invalidateSize());observer.observe(ref.current);
   return ()=>{observer.disconnect();map.remove();};
  // Serialized data avoids recreating the map on every polling response.
  // eslint-disable-next-line react-hooks/exhaustive-deps
  },[signature]);
- return <section className="map-section"><div ref={ref} className="manimahesh-map" aria-label="Manimahesh checkpoint map"/>{!tiles&&<p role="status" className="map-note">Basemap tiles unavailable or loading. Checkpoint markers and the overview below remain available.</p>}<p className="form-help">Indicative locations from the demo dataset, not a verified walking route. Group dots show last reported checkpoints.</p><ol className="checkpoint-overview">{points.map((c,i)=><li key={c.id}><span>{String(i+1).padStart(2,'0')}</span><div><strong>{c.name_en}</strong><small>{c.altitude_m} m</small></div></li>)}</ol></section>;
+ return <section className="map-section"><div ref={ref} className="manimahesh-map" aria-label="Manimahesh checkpoint map"/>{!tiles&&<p role="status" className="map-note">Basemap unavailable or loading. The recorded route line remains visible offline; use the offline route overview below.</p>}<p className="form-help">Recorded walking track: Wikiloc / inditramp, September 2016. Current trail alignment is unverified. Unverified checkpoint pins are omitted; checkpoint order is listed below.</p><ol className="checkpoint-overview">{points.map((c,i)=><li key={c.id}><span>{String(i+1).padStart(2,'0')}</span><div><strong>{c.name_en}</strong><small>{c.altitude_m} m</small></div></li>)}</ol></section>;
 }
 export default ControlMap;
