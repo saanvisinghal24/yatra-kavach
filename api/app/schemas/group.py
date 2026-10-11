@@ -23,9 +23,9 @@ class GroupCreate(BaseModel):
     yatra_id: int
     route_id: int
     leader_name: str = Field(..., min_length=2, max_length=128)
-    leader_phone: str = Field(..., min_length=10, max_length=32)
+    leader_phone: str = Field(..., min_length=10, max_length=10, pattern=r"^[0-9]{10}$")
     emergency_name: str = Field(..., min_length=2, max_length=128)
-    emergency_phone: str = Field(..., min_length=10, max_length=32)
+    emergency_phone: str = Field(..., min_length=10, max_length=10, pattern=r"^[0-9]{10}$")
     size: int = Field(..., ge=1, le=50)
     planned_start: datetime
     planned_return: Optional[datetime] = None

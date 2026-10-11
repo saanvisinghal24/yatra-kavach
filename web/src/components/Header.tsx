@@ -49,26 +49,6 @@ export const Header: React.FC = () => {
 
   return (
     <header style={{ width: '100%', borderBottom: '1px solid var(--border-hairline)', background: 'var(--paper)' }}>
-      {/* 1. Prominent Demo / Simulation Mode Warning Banner */}
-      <div 
-        role="alert"
-        style={{
-          background: 'var(--watch-subtle)',
-          color: 'var(--ink)',
-          borderBottom: '1px solid var(--watch)',
-          padding: '4px 12px',
-          fontSize: '0.78rem',
-          fontWeight: 700,
-          letterSpacing: '0.06em',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}
-      >
-        <span> {t.demoBadge} — SIMULATED DEMO DATA</span>
-        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem' }}>OFFLINE-FIRST PWA v1.1</span>
-      </div>
-
       {/* 2. Main Navigation Bar */}
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: 'var(--space-2) var(--space-4)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
         

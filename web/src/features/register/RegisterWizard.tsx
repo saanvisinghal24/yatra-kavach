@@ -59,6 +59,7 @@ export const RegisterWizard: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!/^[0-9]{10}$/.test(leaderPhone) || !/^[0-9]{10}$/.test(emergencyPhone)) { setError("Both phone numbers must contain exactly 10 digits."); return; }
     setLoading(true);
 
     const payload = {
@@ -228,11 +229,11 @@ export const RegisterWizard: React.FC = () => {
                 <label className="meta-label" htmlFor="leader-phone">{tr("LEADER MOBILE (WHATSAPP / SMS)")}</label>
                 <input 
                   id="leader-phone" 
-                  type="tel" 
+                  type="tel" inputMode="numeric" pattern="[0-9]{10}" minLength={10} maxLength={10} title="Enter exactly 10 digits / ठीक 10 अंक भरें" 
                   required
-                  placeholder="Phone number"
+                  placeholder="10-digit phone number"
                   value={leaderPhone}
-                  onChange={(e) => setLeaderPhone(e.target.value)}
+                  onChange={(e) => setLeaderPhone(e.target.value.replace(/[^0-9]/g, ''))}
                   style={{ marginTop: 'var(--space-1)' }}
                 />
               </div>
@@ -254,11 +255,11 @@ export const RegisterWizard: React.FC = () => {
                 <label className="meta-label" htmlFor="em-phone">{tr("EMERGENCY CONTACT PHONE")}</label>
                 <input 
                   id="em-phone" 
-                  type="tel" 
+                  type="tel" inputMode="numeric" pattern="[0-9]{10}" minLength={10} maxLength={10} title="Enter exactly 10 digits / ठीक 10 अंक भरें" 
                   required
-                  placeholder="Emergency phone"
+                  placeholder="10-digit emergency phone"
                   value={emergencyPhone}
-                  onChange={(e) => setEmergencyPhone(e.target.value)}
+                  onChange={(e) => setEmergencyPhone(e.target.value.replace(/[^0-9]/g, ''))}
                   style={{ marginTop: 'var(--space-1)' }}
                 />
               </div>
