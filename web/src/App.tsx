@@ -1,3 +1,4 @@
+import {RoutePack} from './features/trail/RoutePack';
 import React, {lazy, Suspense} from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 const RegisterWizard=lazy(()=>import('./features/register/RegisterWizard').then(m=>({default:m.RegisterWizard})));
@@ -44,6 +45,7 @@ export const App: React.FC = () => {
             <Route path="/share/:token" element={<FamilyLink />} />
             <Route path="/volunteer" element={<StaffGate><VolunteerScan /></StaffGate>} />
             <Route path="/control" element={<StaffGate><ControlDashboard /></StaffGate>} />
+            <Route path="/offline-map" element={<main className="page"><RoutePack/></main>}/>
             <Route path="/check-in" element={<ScanScreen/>}/>
             <Route path="/privacy" element={<Legal/>}/><Route path="/terms" element={<Legal/>}/>
             <Route path="/about" element={<About/>}/><Route path="/roadmap" element={<Roadmap/>}/>
