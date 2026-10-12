@@ -1,3 +1,4 @@
+import {arrivalTiming} from '../../lib/journeyTiming';
 import {Advisories} from './Advisories';
 import {ControlMap} from '../control/ControlMap';
 import {RoutePack} from './RoutePack';
@@ -71,9 +72,19 @@ export const TrailView: React.FC = () => {
     }
   };
 
-  const localCurrent=checkpoints.find(c=>c.id===currentCpId);
-  const next = remote?.next_checkpoint || checkpoints.find(c=>c.seq>(localCurrent?.seq||0));
-  const nextCheckpoint = next ? {name:language==='hi'?next.name_hi:next.name_en,alt:`${next.altitude_m} m`,time:remote?.eta_range||`${next.min_minutes}–${next.max_minutes} min`,cutoff:next.cutoff_time||'—',dist:`${next.dist_from_prev_km||0} km`} : {name: remote?'No next checkpoint':'Connect to load trail status',alt:'—',time:'—',cutoff:'—',dist:'—'};
+  const [now,setNow]=useState(Date.now());
+  useEffect(()=>{const timer=setInterval(()=>setNow(Date.now()),1000);return()=>clearInterval(timer);},[]);
+  const ordered=[...checkpoints].sort((a,b)=>a.seq-b.seq);
+  const localValid=recentCheckin && recentCheckin.status!=='invalid' ? recentCheckin : null;
+  const remoteTime=remote?.last_checkpoint?.checked_in_at;
+  const localNewer=!!localValid && (!remoteTime || Date.parse(localValid.clientTs)>=Date.parse(/(?:Z|[+-]\d\d:\d\d)$/.test(remoteTime)?remoteTime:remoteTime+'Z'));
+  const current=localNewer?ordered.find(c=>c.id===localValid!.checkpointId):ordered.find(c=>c.id===remote?.last_checkpoint?.id);
+  const direction=localNewer?localValid!.direction:remote?.last_checkpoint?.direction;
+  const next=remote?.status==='completed'||direction==='exit'?null:localNewer&&current?(direction==='returning'?[...ordered].reverse().find(c=>c.seq<current.seq):ordered.find(c=>c.seq>current.seq)):remote?.next_checkpoint ? {...ordered.find(c=>c.id===remote.next_checkpoint.id),...remote.next_checkpoint}:remote?null:ordered[0];
+  const segment=direction==='returning'?current:next;
+  const timing=arrivalTiming(localNewer?localValid!.clientTs:remoteTime,Number(segment?.min_minutes),Number(segment?.max_minutes),now);
+  const nextCheckpoint=next?{name:language==='hi'?next.name_hi:next.name_en,alt:`${next.altitude_m} m`,time:timing?`${timing.arrival} · ${timing.remaining}`:'Scan the starting checkpoint to begin the journey',dist:`${segment?.dist_from_prev_km||0} km`}:{name:'Journey complete / no next checkpoint',alt:'—',time:'—',dist:'—'};
+
 
 
   return (
@@ -123,7 +134,7 @@ export const TrailView: React.FC = () => {
             <span className="numeral" style={{ fontWeight: 700, fontSize: '1.1rem' }}>{nextCheckpoint.alt}</span>
           </div>
           <p style={{ marginTop: 'var(--space-2)', fontSize: '1rem', color: 'var(--ink)' }}>
-            {tr("Usual time")} <span className="numeral" style={{ fontWeight: 600 }}>{nextCheckpoint.time}</span>.
+            Estimated arrival / अनुमानित आगमन: <span className="numeral" style={{ fontWeight: 600 }}>{nextCheckpoint.time}</span>.
           </p>
           {next?.cutoff_time && <p>Configured daily cutoff (IST): <strong>{next.cutoff_time}</strong> · {new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date()) >= next.cutoff_time.slice(0,5) ? 'Cutoff reached — check with checkpoint staff.' : 'Before cutoff — confirm current conditions with staff.'} This is a preset schedule, not a live arrival estimate.</p>}
           <div style={{ display: 'flex', gap: 'var(--space-2)', marginTop: 'var(--space-3)', fontSize: '0.82rem', color: 'var(--ink-2)' }}>
