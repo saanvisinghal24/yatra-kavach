@@ -38,11 +38,37 @@ export const TrailView: React.FC = () => {
   const refreshState = async () => {
     if (!code) return;
     const g = await db.groups.get(code);
-    if (g) {
-      setGroup(g);
-      try {const y=await api<any[]>('/yatras');const r=y.flatMap(v=>v.routes).find(r=>r.id===g.routeId);if(r){setCheckpoints(r.checkpoints);if(!navigator.onLine){const last=await db.checkins.where('groupCode').equals(code).sortBy('clientTs');const latest=last.filter(e=>e.status!=='invalid').at(-1);const cp=r.checkpoints.find((c:any)=>c.id===latest?.checkpointId)||r.checkpoints[0];if(cp)setWeather(await api('/weather/'+cp.id));}}}catch{}
+    if (g) setGroup(g);
+    // Resolve the route from the server too: a shared link may have no local group.
+    let data:any=null;
+    try {
+      data=await api(`/groups/${code}`);
+      setRemote(data);
+      if(data.last_checkpoint)setCurrentCpId(data.last_checkpoint.id);
+    } catch {}
+    try {
+      const yatras=await api<any[]>('/yatras');
+      const routes=yatras.flatMap(v=>v.routes||[]);
+      const routeId=g?.routeId??data?.route_id??data?.routeId??data?.route?.id;
+      const checkpointId=data?.last_checkpoint?.id??data?.next_checkpoint?.id;
+      const route=routeId!=null
+        ? routes.find(r=>String(r.id)===String(routeId))
+        : checkpointId!=null
+          ? routes.find(r=>r.checkpoints?.some((c:any)=>String(c.id)===String(checkpointId)))
+          : null;
+      if(route&&Array.isArray(route.checkpoints)){
+        setCheckpoints(route.checkpoints);
+        if(!navigator.onLine){
+          const saved=await db.checkins.where('groupCode').equals(code).sortBy('clientTs');
+          const latest=saved.filter(e=>e.status!=='invalid').at(-1);
+          const cp=route.checkpoints.find((c:any)=>c.id===latest?.checkpointId)||route.checkpoints[0];
+          if(cp)setWeather(await api('/weather/'+cp.id));
+        }
+      }
+    } catch {}
+    if(data?.next_checkpoint){
+      try {setWeather(await api(`/weather/${data.next_checkpoint.id}`));}catch{}
     }
-    try {const data=await api(`/groups/${code}`);setRemote(data);if(data.last_checkpoint)setCurrentCpId(data.last_checkpoint.id);if(data.next_checkpoint)setWeather(await api(`/weather/${data.next_checkpoint.id}`));}catch{}
 
     const checkins = await db.checkins.where('groupCode').equals(code).sortBy('clientTs');
     if (checkins.length > 0) {
