@@ -6,7 +6,7 @@
     },
     {
       "source": "/health",
-      "destination": "https:yatra-kavach-api.onrender.com/health"
+      "destination": "https://yatra-kavach-api.onrender.com/health"
     },
     {
       "source": "/:path*",
