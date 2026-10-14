@@ -69,7 +69,15 @@ async def chat(request: Request, body: ChatInput):
     try:
         answer = await complete(body.question,body.language,key,model)
         return JSONResponse({'mode':'ai','answer':answer},headers={'Cache-Control':'no-store'})
+    except httpx.HTTPStatusError as exc:
+        status = exc.response.status_code
+        reason = {401: 'provider_auth', 403: 'provider_auth', 404: 'provider_model',
+                  400: 'provider_request', 429: 'provider_rate_limit'}.get(status, 'provider_unavailable')
+        log.warning('Assistant provider HTTP %s; check model/account configuration', status)
+        return JSONResponse({'mode':'saved','reason':reason},headers={'Cache-Control':'no-store'})
+    except httpx.TimeoutException:
+        log.warning('Assistant provider timeout')
+        return JSONResponse({'mode':'saved','reason':'provider_timeout'},headers={'Cache-Control':'no-store'})
     except (httpx.HTTPError, ValueError, KeyError, IndexError, TypeError):
-        # Never log questions, authorization headers or provider response bodies.
-        log.warning('Assistant provider unavailable; using saved guidance')
+        log.warning('Assistant provider unavailable or invalid response')
         return JSONResponse({'mode':'saved','reason':'provider_unavailable'},headers={'Cache-Control':'no-store'})
