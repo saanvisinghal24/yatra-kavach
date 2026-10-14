@@ -51,7 +51,7 @@ async def complete(question: str, language: str, key: str, model: str) -> str:
         response = await client.post('https://api.groq.com/openai/v1/chat/completions',
           headers={'Authorization': 'Bearer '+key}, json={'model':model,
           'messages':[{'role':'system','content':prompt},{'role':'user','content':question}],
-          'temperature':0.2,'max_completion_tokens':400})
+          'temperature':0.2,'max_completion_tokens':2048})
         response.raise_for_status()
         answer = response.json()['choices'][0]['message']['content']
         if not isinstance(answer,str) or not answer.strip():
