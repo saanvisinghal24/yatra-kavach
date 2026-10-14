@@ -20,3 +20,4 @@ playwright-report/
 test-results/
 
 LOCAL_CREDENTIALS.txt
+.env.assistant

@@ -1,3 +1,4 @@
+import YatraAssistant from './features/assistant/YatraAssistant';
 import {RoutePack} from './features/trail/RoutePack';
 import React, {lazy, Suspense} from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
@@ -55,7 +56,7 @@ export const App: React.FC = () => {
             <Route path="/control/groups/:id" element={<StaffGate><GroupDetail/></StaffGate>}/>
             <Route path="/admin/posters" element={<StaffGate><Posters/></StaffGate>}/>
             <Route path="*" element={<NotFound/>}/>
-          </Routes></Suspense></ErrorBoundary><Chrome/>
+          </Routes></Suspense></ErrorBoundary><Chrome/><YatraAssistant/>
         </BrowserRouter>
       </LanguageProvider>
   );

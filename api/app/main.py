@@ -90,3 +90,6 @@ app.include_router(config_router, prefix="/api/v1")
 
 from app.routers.advisories import router as advisories_router
 app.include_router(advisories_router, prefix="/api/v1")
+
+from app.routers.assistant import router as assistant_router
+app.include_router(assistant_router, prefix="/api/v1")
