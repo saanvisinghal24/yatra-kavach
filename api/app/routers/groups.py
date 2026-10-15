@@ -1,3 +1,8 @@
+import hashlib
+import secrets
+from datetime import datetime, timezone
+from pydantic import BaseModel, Field, SecretStr
+from sqlalchemy import text
 from typing import Dict, Any, List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -65,7 +70,9 @@ async def register_group(payload: GroupCreate, db: AsyncSession = Depends(get_db
         )
 
     # 4. Create Group & Members
+    cancellation_token = secrets.token_urlsafe(32)
     new_group = Group(
+        cancellation_token_hash=hashlib.sha256(cancellation_token.encode()).hexdigest(),
         code=candidate_code,
         yatra_id=payload.yatra_id,
         route_id=payload.route_id,
@@ -116,6 +123,7 @@ async def register_group(payload: GroupCreate, db: AsyncSession = Depends(get_db
         id=new_group.id,
         code=new_group.code,
         pass_token=make_pass_token(new_group.code),
+        cancellation_token=cancellation_token,
         yatra_id=new_group.yatra_id,
         route_id=new_group.route_id,
         leader_name=new_group.leader_name,
@@ -209,6 +217,10 @@ async def get_group_status(code: str, db: AsyncSession = Depends(get_db)):
             }
             eta_range = "Trailhead Start"
 
+    if group.status == "cancelled":
+        next_cp_dict = None
+        eta_range = None
+
     open_advice = [
         {
             "rule_id": f.rule_id,
@@ -234,7 +246,37 @@ async def get_group_status(code: str, db: AsyncSession = Depends(get_db)):
         checkpoint_statuses=[{"id":cp.id,"name_en":cp.name_en,"name_hi":cp.name_hi,"status":cp.status,"facilities":cp.facilities} for cp in checkpoints],
         planned_return=group.planned_return,
         members=[{"id":m.id,"name":m.name,"age_band":m.age_band,"journey_state":m.journey_state,"last_checkpoint_id":m.last_checkpoint_id,"last_visit_at":m.last_visit_at.isoformat() if m.last_visit_at else None,"confirmation_source":m.confirmation_source} for m in group.members],
-        journey_counts={state:sum(m.journey_state==state for m in group.members) for state in ('planned','outbound','returning','exit_pending','exited')},
+        journey_counts={state:sum(m.journey_state==state for m in group.members) for state in ('planned','outbound','returning','exit_pending','exited','cancelled')},
         incidents=[{"id":i.id,"status":i.status,"type":i.type} for i in (await db.execute(select(Incident).where(Incident.group_id==group.id))).scalars()],
         open_advice=open_advice
     )
+
+
+class CancelTripRequest(BaseModel):
+    cancellation_token: SecretStr
+    reason: str = Field(default="", max_length=300)
+
+
+@router.post("/{code}/cancel")
+async def cancel_trip(code: str, payload: CancelTripRequest, db: AsyncSession = Depends(get_db)):
+    # Same transaction lock as check-in ingest, so a scan cannot race cancellation.
+    if db.bind.dialect.name == "postgresql":
+        await db.execute(text("SELECT pg_advisory_xact_lock(hashtext(:key))"), {"key": code})
+    group = (await db.execute(select(Group).where(Group.code == code).with_for_update())).scalar_one_or_none()
+    token_hash = hashlib.sha256(payload.cancellation_token.get_secret_value().encode()).hexdigest()
+    if not group or not group.cancellation_token_hash or not secrets.compare_digest(token_hash, group.cancellation_token_hash):
+        raise HTTPException(403, "Cancellation is available only on the browser used to register this pass.")
+    if group.status == "cancelled":
+        return {"code": code, "status": "cancelled"}
+    members = list((await db.execute(select(Member).where(Member.group_id == group.id))).scalars())
+    scan = (await db.execute(select(Checkin.id).where(Checkin.group_id == group.id, Checkin.valid == True).limit(1))).first()
+    incident = (await db.execute(select(Incident.id).where(Incident.group_id == group.id, Incident.status != "closed").limit(1))).first()
+    if group.status != "planned" or group.started_at or scan or any(m.journey_state != "planned" for m in members) or incident:
+        raise HTTPException(409, "Trip cannot be cancelled after a check-in or while assistance is open. Contact checkpoint staff.")
+    group.status = "cancelled"
+    group.cancelled_at = datetime.now(timezone.utc)
+    group.cancellation_reason = payload.reason.strip() or None
+    for member in members:
+        member.journey_state = "cancelled"
+    await db.commit()
+    return {"code": code, "status": "cancelled"}

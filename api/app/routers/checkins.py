@@ -74,6 +74,12 @@ async def ingest_checkin_batch(
             invalids += 1
             continue
 
+        if group.status == "cancelled":
+            results.append(CheckinResultItem(id=item.id, status="invalid", valid=False,
+                invalid_reason="This trip has been cancelled. Contact checkpoint staff if already on the trail.", server_ts=now))
+            invalids += 1
+            continue
+
         # 3. Checkpoint Verification
         cp_stmt = select(Checkpoint).where(Checkpoint.id == item.checkpoint_id)
         cp_res = await db.execute(cp_stmt)

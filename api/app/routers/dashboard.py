@@ -88,7 +88,7 @@ async def get_dashboard_groups(
         valid_scans = [c for c in g.checkins if c.valid]
         last_cp_id = None
         last_scan_time = None
-        current_headcount = g.size
+        current_headcount = 0 if g.status == "cancelled" else g.size
         if valid_scans:
             valid_scans.sort(key=lambda s: s.client_ts)
             last_cp_id = valid_scans[-1].checkpoint_id

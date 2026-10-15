@@ -11,6 +11,8 @@ export interface LocalGroup {
   emergencyPhone: string;
   size: number;
   passToken: string;
+  cancellationToken?: string;
+  tripStatus?: string;
   createdAt: string;
   synced: boolean;
 }

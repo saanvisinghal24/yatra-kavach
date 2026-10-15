@@ -22,6 +22,10 @@ class Group(Base):
     status: Mapped[str] = mapped_column(String(32), default="planned", nullable=False)  # planned/active/completed/flagged/rescued
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
+    cancellation_token_hash: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    cancelled_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    cancellation_reason: Mapped[Optional[str]] = mapped_column(String(300), nullable=True)
+
     consent_version: Mapped[str] = mapped_column(String(16), default="demo-v1", nullable=False)
     simulated: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 

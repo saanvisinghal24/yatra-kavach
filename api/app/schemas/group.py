@@ -44,6 +44,7 @@ class GroupRegisterResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
     code: str
+    cancellation_token: Optional[str] = None
     pass_token: str  # YK1:<code>
     yatra_id: int
     route_id: int

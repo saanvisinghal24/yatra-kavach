@@ -14,6 +14,32 @@ export const PassView: React.FC = () => {
   const [group, setGroup] = useState<LocalGroup | null>(null);
   const [qrError,setQrError]=useState('');
   const [share,setShare]=useState('');
+  const [tripStatus, setTripStatus] = useState('');
+  const [statusVerified, setStatusVerified] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
+  const [cancelMessage, setCancelMessage] = useState('');
+  const [online, setOnline] = useState(navigator.onLine);
+  useEffect(() => {
+    const update = () => setOnline(navigator.onLine);
+    window.addEventListener('online', update); window.addEventListener('offline', update);
+    return () => { window.removeEventListener('online', update); window.removeEventListener('offline', update); };
+  }, []);
+  const cancelTrip = async () => {
+    if (!code || !group?.cancellationToken || !navigator.onLine || cancelling) return;
+    if (!window.confirm('Cancel the ENTIRE group trip? Confirm that nobody has started travelling or recorded an offline checkpoint scan. This cannot be undone.')) return;
+    const reason = window.prompt('Reason (optional, maximum 300 characters):', '');
+    if (reason === null) return;
+    if (reason.length > 300) { setCancelMessage('Keep the reason within 300 characters.'); return; }
+    setCancelling(true); setCancelMessage('');
+    try {
+      const pending = (await db.checkins.where('groupCode').equals(code).toArray()).some(event => event.status === 'pending');
+      if (pending) throw new Error('Pending checkpoint scans exist. Sync them before requesting cancellation.');
+      await post(`/groups/${code}/cancel`, {cancellation_token: group.cancellationToken, reason});
+      setTripStatus('cancelled'); setCancelMessage('Your group trip has been cancelled.');
+      await db.groups.update(code, {tripStatus: 'cancelled'}).catch(() => undefined);
+    } catch (error) { setCancelMessage((error as Error).message); }
+    finally { setCancelling(false); }
+  };
   const [advisory, setAdvisory] = useState<string | null>(null);
 
   useEffect(() => {
@@ -34,13 +60,17 @@ export const PassView: React.FC = () => {
     db.groups.get(code).then(stored => {
       if (stored) {
         setGroup(stored);
+        if (stored.tripStatus === "cancelled") setTripStatus("cancelled");
       }
     }).catch(() => undefined);
 
+    const awaitStatusCache = (status: string) => { void db.groups.update(code, {tripStatus: status}).catch(() => undefined); };
+
     // Check backend status if online
     fetch(`/api/v1/groups/${code}`)
-      .then(res => res.json())
+      .then(res => { if (!res.ok) throw new Error("Could not verify pass status"); return res.json(); })
       .then(data => {
+        if (data.code) { setTripStatus(data.status); setStatusVerified(true); awaitStatusCache(data.status); }
         if (data.code) setGroup(old => old || ({code:data.code,leaderName:data.leader_name,size:data.size} as LocalGroup));
         if (data.open_advice && data.open_advice.length > 0) {
           setAdvisory(data.open_advice[0].message_en);
@@ -49,7 +79,7 @@ export const PassView: React.FC = () => {
       .catch(() => {
         // Offline is fine
       });
-  }, [code]);
+  }, [code, online]);
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--paper)', padding: 'var(--space-4)' }}>
@@ -76,7 +106,7 @@ export const PassView: React.FC = () => {
           </div>
 
           {/* QR Code Canvas */}
-          {qrUrl ? (
+          {tripStatus === "cancelled" ? <h3 role="status">TRIP CANCELLED</h3> : qrUrl ? (
             <div style={{ display: 'inline-block', padding: 'var(--space-2)', border: '1px solid var(--line)', background: '#FFFFFF', borderRadius: 'var(--radius)' }}>
               <img src={qrUrl} alt={`Pass QR for group ${code}`} style={{ display: 'block', width: '220px', height: '220px' }} />
             </div>
@@ -86,7 +116,7 @@ export const PassView: React.FC = () => {
             </div>
           )}
 
-          {qrUrl&&<div className="pass-actions"><a className="btn" href={qrUrl} download={`Yatra-Pass-${code}.png`}>Download QR</a><button onClick={()=>window.print()}>Print pass</button></div>}
+          {qrUrl && tripStatus !== "cancelled" && <div className="pass-actions"><a className="btn" href={qrUrl} download={`Yatra-Pass-${code}.png`}>Download QR</a><button onClick={()=>window.print()}>Print pass</button></div>}
           <div style={{ marginTop: 'var(--space-4)', textAlign: 'left', borderTop: 'var(--border-hairline)', paddingTop: 'var(--space-3)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--space-2)' }}>
               <span className="meta-label">{tr("LEADER:")}</span>
@@ -102,6 +132,20 @@ export const PassView: React.FC = () => {
             </div>
           </div>
         </div>
+
+        <section className="trail-card-secondary" style={{marginTop: 'var(--space-4)'}} aria-label="Trip cancellation">
+          <h3>Cancel group trip</h3>
+          {tripStatus === 'cancelled' ? <p>This pass is cancelled and cannot be checked in.</p> : <>
+            <p>Only before the journey starts. Cancels every member on this pass.</p>
+            {!group?.cancellationToken && <p>Available only for new passes on the browser used to register. Existing passes cannot be cancelled here.</p>}
+            {!online && <p>Connect to the internet to cancel.</p>}
+            {statusVerified && tripStatus !== 'planned' && <p>Journey already started. Contact checkpoint staff for return assistance.</p>}
+            <button type="button" disabled={!online || !statusVerified || tripStatus !== 'planned' || !group?.cancellationToken || cancelling} onClick={cancelTrip}>
+              {cancelling ? 'Cancelling...' : 'Cancel Entire Group Trip'}
+            </button>
+          </>}
+          {cancelMessage && <p role="status">{cancelMessage}</p>}
+        </section>
 
         {/* Advisory alert if R10 triggered */}
         {advisory && (
@@ -121,6 +165,7 @@ export const PassView: React.FC = () => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', marginTop: 'var(--space-6)' }}>
           <button 
             className="btn-primary" 
+            disabled={tripStatus === "cancelled"}
             onClick={() => navigate(`/trail/${code}`)}
             style={{ width: '100%' }}
           >

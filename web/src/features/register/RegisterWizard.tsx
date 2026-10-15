@@ -90,10 +90,12 @@ export const RegisterWizard: React.FC = () => {
 
       let code = '';
       let passToken = '';
+      let cancellationToken: string | undefined;
       if (res.ok) {
         const data = await res.json();
         code = data.code;
         passToken = data.pass_token;
+        cancellationToken = data.cancellation_token;
         if (data.advisories && data.advisories.length > 0) {
           setAdvisories(data.advisories);
         }
@@ -111,6 +113,8 @@ export const RegisterWizard: React.FC = () => {
         emergencyPhone,
         size: groupSize,
         passToken,
+        cancellationToken,
+        tripStatus: "planned",
         createdAt: new Date().toISOString(),
         synced: res.ok
       }).catch(()=>undefined);
